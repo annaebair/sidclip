@@ -1,0 +1,10 @@
+checkpoints/
+__pycache__/
+*.pyc
+*.pth
+smoke_test.out
+syn_smoke_test.out
+run_smoke.sh
+run_syn_smoke.sh
+*.egg-info/
+.DS_Store
