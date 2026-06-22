@@ -1,4 +1,4 @@
-# SID-CLIP: Synthetic Image Distillation from CLIP
+# SIDCLIP: Synthetic Image Distillation from CLIP
 
 Few-shot image classification via knowledge distillation from a frozen CLIP teacher into a smaller student model, augmented with Kandinsky-generated synthetic training images.
 
@@ -60,6 +60,7 @@ Train a `LayerNorm + Linear` classification head on top of a frozen CLIP backbon
 ```bash
 python finetune.py --mode last_layer --model ViT-L/14 --dataset StanfordCars \
   --shot 8 --seed 0 --save_name stanfordcars_vitl14 --lr 1e-4 --epochs 40
+# or: bash finetune.sh ViT-L/14 StanfordCars 8 0 stanfordcars_vitl14
 ```
 
 ### Step 2: Generate synthetic images
@@ -69,16 +70,18 @@ Uses Kandinsky 2.1 to interpolate between CLIP text and image embeddings:
 ```bash
 python stable_diffusion_gen.py --dataset StanfordCars --shot 8 --syn_shot 300 \
   --start_idx 0 --seed 0
+# or: bash gen.sh StanfordCars 8 0 0
 ```
 
 ### Step 3: Distill
 
-Distill from the CLIP teacher into a student model (EfficientNet or TimEfNet) using KL divergence loss over soft teacher predictions, with synthetic data for the first `syn_epochs` epochs:
+Distill from the CLIP teacher into a student model using KL divergence loss over soft teacher predictions, with synthetic data for the first `syn_epochs` epochs:
 
 ```bash
 python distill.py --epochs 40 --lr 8e-6 --dist_method kl --batch_size 64 \
   --syn_epochs 30 --model TimEfNetb0 --dataset StanfordCars --shot 8 \
   --syn_shot 300 --seed 0 --teacher ViT-L/14
+# or: bash distill.sh TimEfNetb0 StanfordCars 8 0 ViT-L/14
 ```
 
 ### Baseline (train from scratch, no teacher)
@@ -86,6 +89,7 @@ python distill.py --epochs 40 --lr 8e-6 --dist_method kl --batch_size 64 \
 ```bash
 python train.py --lr 4e-4 --epochs 40 --dataset StanfordCars \
   --model efficientnet_b0 --shot 8 --seed 0
+# or: bash train.sh StanfordCars efficientnet_b0 8 0
 ```
 
 ## Supported Datasets
@@ -104,8 +108,8 @@ python train.py --lr 4e-4 --epochs 40 --dataset StanfordCars \
 
 ## Teacher Models
 
-- `ViT-L/14` — OpenAI CLIP ViT-Large
-- `ViT-B/32` — OpenAI CLIP ViT-Base
+- `ViT-L/14` — CLIP ViT-Large
+- `ViT-B/32` — CLIP ViT-Base
 
 ## Key Hyperparameters
 
